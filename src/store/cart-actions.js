@@ -1,8 +1,11 @@
+import { createAsyncThunk } from "@reduxjs/toolkit";
+
 import { uiActions } from "./ui-slice";
 import { cartActions } from "./cart-slice";
 
-export const fetchCartData = () => {
-  return async (dispatch) => {
+export const fetchCartData = createAsyncThunk(
+  "cartSlice/fetchCartData",
+  async (_, thunkAPI) => {
     const fetchData = async () => {
       const response = await fetch(
         "https://react-http-ab4ba-default-rtdb.asia-southeast1.firebasedatabase.app/cart.json"
@@ -20,14 +23,9 @@ export const fetchCartData = () => {
     try {
       const cartData = await fetchData();
       if (cartData) {
-        dispatch(
-          cartActions.replaceCart({
-            items: cartData.items,
-            totalQuantity: cartData.totalQuantity,
-          })
-        );
+        thunkAPI.dispatch(cartActions.replaceCart(cartData));
       } else {
-        dispatch(
+        thunkAPI.dispatch(
           cartActions.replaceCart({
             items: [],
             totalQuantity: 0,
@@ -35,7 +33,7 @@ export const fetchCartData = () => {
         );
       }
     } catch (error) {
-      dispatch(
+      thunkAPI.dispatch(
         uiActions.showNotification({
           status: "error",
           title: "Error!",
@@ -43,12 +41,13 @@ export const fetchCartData = () => {
         })
       );
     }
-  };
-};
+  }
+);
 
-export const sendCartData = (cart) => {
-  return async (dispatch) => {
-    dispatch(
+export const sendCartData = createAsyncThunk(
+  "cartSlice/sendCartData",
+  async (cart, thunkAPI) => {
+    thunkAPI.dispatch(
       uiActions.showNotification({
         status: "pending",
         title: "Sending...",
@@ -76,7 +75,7 @@ export const sendCartData = (cart) => {
     try {
       await sendRequest();
 
-      dispatch(
+      thunkAPI.dispatch(
         uiActions.showNotification({
           status: "success",
           title: "Success!",
@@ -84,7 +83,7 @@ export const sendCartData = (cart) => {
         })
       );
     } catch (error) {
-      dispatch(
+      thunkAPI.dispatch(
         uiActions.showNotification({
           status: "error",
           title: "Error!",
@@ -92,5 +91,5 @@ export const sendCartData = (cart) => {
         })
       );
     }
-  };
-};
+  }
+);

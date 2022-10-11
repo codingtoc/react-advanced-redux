@@ -1,5 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+import { fetchCartData, sendCartData } from "./cart-actions";
+
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -42,6 +44,14 @@ const cartSlice = createSlice({
         existingItem.totalPrice = existingItem.totalPrice - existingItem.price;
       }
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchCartData.fulfilled, (state, action) => {
+      state.cart = action.payload;
+    });
+    builder.addCase(sendCartData.fulfilled, (state, action) => {
+      state.cart = action.payload;
+    });
   },
 });
 
